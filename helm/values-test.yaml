@@ -1,0 +1,105 @@
+# Default values for generic-deployment.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: swr.ap-southeast-3.myhuaweicloud.com/test/app-fronend
+  tag: latest
+  pullPolicy: Always
+imagePullSecrets:
+  - test
+
+nameOverride: app-fronend-dev
+fullnameOverride: app-fronend-dev
+
+env:
+  - name: REACT_APP_API_URL
+    value: https://test-api.demo.co
+
+volumeMounts:
+  {}
+  # - name: api-data
+  #   mountPath: /var/www/images
+  #   readOnly: false
+
+volumes:
+  {}
+  # - name: api-data
+  #   persistentVolumeClaim:
+  #     claimName: api-storage
+
+containerPorts:
+  - 80
+
+resources:
+  {}
+  # requests:
+  #   cpu: 100m
+  #   memory: 50Mi
+  # limits:
+  #   cpu: 2
+  #   memory: 2Gi
+
+nodeSelector:
+  []
+  # type: api
+
+tolerations: []
+
+affinity: {}
+
+service:
+  enabled: true
+  type: ClusterIP
+  annotation: {}
+  ports:
+    - name: http
+      protocol: TCP
+      externalPort: 80
+      internalPort: 80
+
+serviceHeadless:
+  enabled: false
+
+healthCheck:
+  enabled: false
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 0
+    timeoutSeconds: 1
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 0
+    timeoutSeconds: 1
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+
+ingress:
+  enabled: true
+  class: nginx
+  annotations:
+    # kubernetes.io/ingress.class: nginx
+    # cert-manager.io/cluster-issuer: "letsencrypt"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  rules:
+    - host: app-frontend.test.co
+      http:
+        paths:
+          - path: /
+            backend:
+              servicePort: 80
+  tls:
+    - hosts:
+        - app-frontend.test.co
+      secretName: test-tls
