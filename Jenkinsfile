@@ -17,7 +17,7 @@ import groovy.json.JsonSlurperClassic
       }
       stage('Build') {
           steps {
-          container('maven') {
+          container('docker') {
               echo 'Building...'
             }
           }
