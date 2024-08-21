@@ -29,7 +29,11 @@ spec:
       command:
         - cat
       tty: true
+      volumeMounts:
+        - mountPath: "/var/run/docker.sock"
+          name: "volume-0"
+          readOnly: false
       volumes:
-        - name: docker-sock
+        - name: volume-0
           hostPath:
             path: /var/run/docker.sock
