@@ -2,6 +2,22 @@
 
 import groovy.json.JsonSlurperClassic
 
+
+def commitSha1() {
+  sh 'git rev-parse HEAD > commitSha1'
+  def commit = readFile('commitSha1').trim()
+  sh 'rm commitSha1'
+  commit.substring(0, 11)
+}
+
+def projectName = "frontend"
+def dockerRegistry = "registry.gitlab.com"
+def repo = "${dockerRegistry}/dev/${projectName}"
+def imageName = "${repo}"
+def commitSha = commitSha1()
+def tagPrefix = env.BRANCH_NAME
+def imageTag = "${tagPrefix}-${commitSha}"
+
   pipeline {
   agent {
     kubernetes {
@@ -10,7 +26,7 @@ import groovy.json.JsonSlurperClassic
   }
 
   stages {
-      stage('Clone repositorดy') {
+      stage('Clone repository') {
           steps {
               checkout scm
           }
@@ -18,7 +34,7 @@ import groovy.json.JsonSlurperClassic
       stage('Build') {
           steps {
           container('docker') {
-              echo 'Building...'
+              docker.build("${imageName}:${imageTag}", ".")
             }
           }
       }
