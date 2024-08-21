@@ -34,7 +34,9 @@ def imageTag = "${tagPrefix}-${commitSha}"
       stage('Build') {
           steps {
           container('docker') {
-              docker.build("${imageName}:${imageTag}", ".")
+            sh """
+            docker version
+            """
             }
           }
       }
