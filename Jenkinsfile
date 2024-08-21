@@ -2,8 +2,6 @@
 
 import groovy.json.JsonSlurperClassic
 
-
-
   pipeline {
   agent {
     kubernetes {
