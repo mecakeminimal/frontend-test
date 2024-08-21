@@ -1,23 +1,43 @@
-pipeline {
+
+
+import groovy.json.JsonSlurperClassic
+
+
+
+  pipeline {
   agent {
     kubernetes {
       yamlFile 'KubernetesPod.yaml'
     }
   }
+
   stages {
-    stage('Run maven') {
-      steps {
-        sh 'set'
-        sh "echo OUTSIDE_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}"
-        container('maven') {
-          sh 'echo MAVEN_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}'
-          sh 'mvn -version'
-        }
-        container('busybox') {
-          sh 'echo BUSYBOX_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}'
-          sh '/bin/busybox'
-        }
+      stage('Clone repositorดy') {
+          steps {
+              checkout scm
+          }
       }
-    }
+      stage('Build') {
+          steps {
+          container('maven') {
+              echo 'Building...'
+            }
+          }
+      }
+      stage('Test') {
+          steps {
+              echo 'Testing...'
+          }
+      }
+      stage('Deploy') {
+          steps {
+              echo 'Deploying...'
+          }
+      }
   }
+post {
+    always {
+        echo 'Cleanup actions'
+    }
+}
 }
